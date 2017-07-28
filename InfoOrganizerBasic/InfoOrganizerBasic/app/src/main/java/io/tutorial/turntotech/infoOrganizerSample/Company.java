@@ -15,4 +15,10 @@ public class Company {
         company_name = s;
         products = new ArrayList<Product>();
     }
+
+    public Company(String s, String URL){
+        company_name = s;
+        logoURL = URL;
+        products = new ArrayList<Product>();
+    }
 }

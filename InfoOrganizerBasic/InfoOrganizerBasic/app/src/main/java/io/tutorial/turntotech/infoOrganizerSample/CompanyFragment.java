@@ -13,8 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +29,6 @@ import java.util.List;
 public class CompanyFragment extends Fragment {
 
     private RecyclerView recycler_view;
-    private ArrayList<String> listOfComany;
-    private ArrayList<Company> listOfCompany;
     private  VerticalAdapter recyclerAdapter;
     ImageButton addButton;
     ImageButton backButton;
@@ -63,7 +64,7 @@ public class CompanyFragment extends Fragment {
                         Toast.makeText(getContext(),DAO.getcompanyList().get(position).company_name,Toast.LENGTH_SHORT).show();
 
 
-                        ((StartActivity) getActivity()).setCurrentCompanyNo(position);
+                        DAO.setCompanyNo(position);
 
                         // Go to Child not Found Screen
                         Fragment productFragment = new ProductFragment();
@@ -113,11 +114,12 @@ public class CompanyFragment extends Fragment {
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public TextView txtView;
+            public ImageView imView;
 
             public MyViewHolder(View view) {
                 super(view);
                 txtView = (TextView) view.findViewById(R.id.txtView);
-
+                imView = (ImageView) view.findViewById(R.id.imageView);
             }
         }
 
@@ -138,14 +140,8 @@ public class CompanyFragment extends Fragment {
 
             holder.txtView.setText(verticalList.get(position).company_name);
             // If you want to access separate part of it
+            Picasso.with(getContext()).load(verticalList.get(position).logoURL).into(holder.imView);
 
-            holder.txtView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Toast.makeText(getContext(),holder.txtView.getText().toString(),Toast.LENGTH_SHORT).show();
-                }
-            });
         }
 
         @Override
