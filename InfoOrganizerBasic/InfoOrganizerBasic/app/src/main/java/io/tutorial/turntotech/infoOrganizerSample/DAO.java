@@ -10,6 +10,7 @@ public class DAO {
 
     private static ArrayList<Company> companyList;
     private static int companyNo, productNo;
+    private static boolean edit;
 
     static DAO instance;
     public static DAO getInstance(){
@@ -115,4 +116,21 @@ public class DAO {
         companyList.add(HTC);
     }
 
+    public void AddCompany(String Name, String LogoURL){
+        Company company = new Company(Name, LogoURL);
+        DAO.getcompanyList().add(company);
+    }
+
+    public void AddProduct(String Name, String LogoURL, String ProductURL){
+        Product product = new Product(Name, LogoURL, ProductURL);
+        DAO.getcompanyList().get(DAO.getCompanyNo()).products.add(product);
+    }
+
+    public static void setEdit(boolean bool) {
+        edit = bool;
+    }
+
+    public static boolean getEdit() {
+        return edit;
+    }
 }

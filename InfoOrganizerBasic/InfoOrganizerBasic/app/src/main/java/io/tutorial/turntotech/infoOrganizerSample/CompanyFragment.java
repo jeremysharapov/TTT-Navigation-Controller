@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ public class CompanyFragment extends Fragment {
     private  VerticalAdapter recyclerAdapter;
     ImageButton addButton;
     ImageButton backButton;
+    CheckBox Edit;
 
 
     @Nullable
@@ -63,20 +65,28 @@ public class CompanyFragment extends Fragment {
         recycler_view.addOnItemTouchListener(
                 new RecyclerItemClickListener(getContext(), recycler_view ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
-                        Toast.makeText(getContext(),DAO.getcompanyList().get(position).company_name,Toast.LENGTH_SHORT).show();
-
-
                         DAO.setCompanyNo(position);
 
-                        // Go to Child not Found Screen
-                        Fragment productFragment = new ProductFragment();
-                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.mainLayout, productFragment);
-                        fragmentTransaction.addToBackStack(null);
+                        if(Edit.isChecked()){
+                            DAO.setEdit(true);
+                            Toast.makeText(getContext(),"Edit " + DAO.getcompanyList().get(position).company_name,Toast.LENGTH_LONG).show();
+                            Fragment editCompanyFragment = new EditCompanyFragment();
+                            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                            fragmentTransaction.replace(R.id.mainLayout, editCompanyFragment);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
+                        }
 
-                        // Commit the transaction
-                        fragmentTransaction.commit();
+                        else {
+                            Toast.makeText(getContext(), DAO.getcompanyList().get(position).company_name, Toast.LENGTH_SHORT).show();
+                            Fragment productFragment = new ProductFragment();
+                            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                            fragmentTransaction.replace(R.id.mainLayout, productFragment);
+                            fragmentTransaction.addToBackStack(null);
+                            fragmentTransaction.commit();
+                        }
 
                     }
 
@@ -114,6 +124,7 @@ public class CompanyFragment extends Fragment {
         actionBar.setCustomView(R.layout.toolbar);
         backButton = (ImageButton)activity.findViewById(R.id.imageButton);
         addButton = (ImageButton)activity.findViewById(R.id.imageButton2);
+        Edit = (CheckBox)activity.findViewById(R.id.Edit);
         backButton.setVisibility(View.INVISIBLE);
 
 
@@ -121,7 +132,14 @@ public class CompanyFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DAO.setEdit(false);
                 Toast.makeText(getContext(),"Add",Toast.LENGTH_LONG).show();
+                Fragment editCompanyFragment = new EditCompanyFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.mainLayout, editCompanyFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
 
@@ -163,7 +181,7 @@ public class CompanyFragment extends Fragment {
 
             holder.txtView.setText(verticalList.get(position).company_name);
             // If you want to access separate part of it
-            Picasso.with(getContext()).load(verticalList.get(position).logoURL).into(holder.imView);
+            Picasso.with(getContext()).load(verticalList.get(position).logoURL).placeholder(R.mipmap.ic_launcher).into(holder.imView);
 
         }
 

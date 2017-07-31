@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Web"></activity>
+        <activity android:name=".Web" />
+        <activity android:name=".EditCompanyActivity" />
+        <activity android:name=".EditProductActivity"></activity>
     </application>
 
 </manifest>
