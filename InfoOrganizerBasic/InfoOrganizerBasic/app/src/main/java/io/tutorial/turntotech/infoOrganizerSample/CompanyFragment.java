@@ -1,5 +1,7 @@
 package io.tutorial.turntotech.infoOrganizerSample;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -79,7 +81,28 @@ public class CompanyFragment extends Fragment {
                     }
 
                     @Override public void onLongItemClick(View view, int position) {
-                        // do what you want
+                        final int pos = position;
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        DAO.getcompanyList().remove(pos);
+                                        recyclerAdapter=new VerticalAdapter(DAO.getcompanyList());
+                                        LinearLayoutManager layoutmanager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+                                        recycler_view.setLayoutManager(layoutmanager2);
+                                        recycler_view.setAdapter(recyclerAdapter);
+                                        break;
+
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        //Do your No progress
+                                        break;
+                                }
+                            }
+                        };
+                        AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
+                        ab.setMessage("Are you sure you want to delete " + DAO.getcompanyList().get(position).company_name + "?").setPositiveButton("Yes", dialogClickListener)
+                                .setNegativeButton("No", dialogClickListener).show();
                     }
                 })
         );

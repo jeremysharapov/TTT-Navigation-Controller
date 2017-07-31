@@ -1,5 +1,7 @@
 package io.tutorial.turntotech.infoOrganizerSample;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
@@ -79,7 +81,30 @@ public class ProductFragment extends Fragment {
                     }
 
                     @Override
-                    public void onLongItemClick(View view, int position) {
+                    public void onLongItemClick(View view, int position){
+                    final int pos = position;
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        DAO.getcompanyList().get(DAO.getCompanyNo()).products.remove(pos);
+                                        recyclerProductAdapter=new ProductFragment.VerticalProductAdapter(DAO.getcompanyList().get(DAO.getCompanyNo()).products);
+                                        LinearLayoutManager layoutmanager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+                                        product_recycler_view.setLayoutManager(layoutmanager2);
+                                        product_recycler_view.setAdapter(recyclerProductAdapter);
+                                        break;
+
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        //Do your No progress
+                                        break;
+                                }
+                            }
+                        };
+                        AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
+                        ab.setMessage("Are you sure you want to delete " + DAO.getcompanyList().get(getCompanyNo()).products.get(position).product_name + "?").setPositiveButton("Yes", dialogClickListener)
+                                .setNegativeButton("No", dialogClickListener).show();
+
 
                     }
                 }));
