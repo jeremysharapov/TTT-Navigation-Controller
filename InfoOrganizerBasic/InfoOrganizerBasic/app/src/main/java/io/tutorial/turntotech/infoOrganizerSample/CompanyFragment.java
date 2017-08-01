@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CompanyFragment extends Fragment {
+public class CompanyFragment extends Fragment implements ICallBack {
 
     private RecyclerView recycler_view;
     private  VerticalAdapter recyclerAdapter;
@@ -44,12 +44,17 @@ public class CompanyFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.activity_main, container, false);
 
-
+        DAO.getInstance();
+        DAO.getInstance().setCallBack(this);
+        DAO.getStockURL();
+        DAO.getInstance().sendVolleyRequest(getContext());
 
         recycler_view= (RecyclerView) view.findViewById(R.id.vertical_recycler_view);
 
 
-        DAO.getInstance();
+
+
+
 
 
         recyclerAdapter=new VerticalAdapter(DAO.getcompanyList());
@@ -149,18 +154,24 @@ public class CompanyFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void updateStockPrice() {
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
     public class VerticalAdapter extends RecyclerView.Adapter<VerticalAdapter.MyViewHolder> {
 
         private List<Company> verticalList;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
-            public TextView txtView;
+            public TextView txtView, stock;
             public ImageView imView;
 
             public MyViewHolder(View view) {
                 super(view);
                 txtView = (TextView) view.findViewById(R.id.txtView);
                 imView = (ImageView) view.findViewById(R.id.imageView);
+                stock = (TextView) view.findViewById(R.id.textView2);
             }
         }
 
@@ -180,6 +191,7 @@ public class CompanyFragment extends Fragment {
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
             holder.txtView.setText(verticalList.get(position).company_name);
+            holder.stock.setText(verticalList.get(position).stock_ticker + " - " + verticalList.get(position).stock_price);
             // If you want to access separate part of it
             Picasso.with(getContext()).load(verticalList.get(position).logoURL).placeholder(R.mipmap.ic_launcher).into(holder.imView);
 

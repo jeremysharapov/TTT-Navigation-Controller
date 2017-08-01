@@ -11,9 +11,10 @@ public class Company {
     String company_name, logoURL, stock_ticker, stock_price;
     ArrayList<Product> products;
 
-    public Company(String s, String URL){
+    public Company(String s, String URL, String stock){
         company_name = s;
         logoURL = URL;
+        stock_ticker = stock;
         products = new ArrayList<Product>();
     }
 }

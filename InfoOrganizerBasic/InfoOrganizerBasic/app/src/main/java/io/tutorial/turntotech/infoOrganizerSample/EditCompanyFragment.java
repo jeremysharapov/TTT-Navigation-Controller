@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 public class EditCompanyFragment extends Fragment{
-    EditText Name, LogoURL;
+    EditText Name, LogoURL, StockTicker;
     Button submitButton;
     ImageButton backButton,addButton;
     CheckBox Edit;
@@ -27,6 +27,7 @@ public class EditCompanyFragment extends Fragment{
         View view = inflater.inflate(R.layout.activity_edit_company, container, false);
         Name = (EditText)view.findViewById(R.id.CompanyName);
         LogoURL = (EditText)view.findViewById(R.id.LogoURL);
+        StockTicker = (EditText)view.findViewById(R.id.StockTicker);
         submitButton = (Button)view.findViewById(R.id.Finish);
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -42,16 +43,23 @@ public class EditCompanyFragment extends Fragment{
         if(DAO.getEdit()){
             Name.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).company_name);
             LogoURL.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).logoURL);
+            StockTicker.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).stock_ticker);
         }
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LogoURL.getText().toString().equals("")){
-                    DAO.getInstance().AddCompany(Name.getText().toString(), "R.mipmap.ic_launcher");
+                if (LogoURL.getText().toString().equals("") && StockTicker.getText().toString().equals("")){
+                    DAO.getInstance().AddCompany(Name.getText().toString(), "R.mipmap.ic_launcher", "_");
+                }
+                else if (LogoURL.getText().toString().equals("")){
+                    DAO.getInstance().AddCompany(Name.getText().toString(), "R.mipmap.ic_launcher", StockTicker.getText().toString());
+                }
+                else if (StockTicker.getText().toString().equals("")){
+                    DAO.getInstance().AddCompany(Name.getText().toString(), LogoURL.getText().toString(), "_");
                 }
                 else {
-                    DAO.getInstance().AddCompany(Name.getText().toString(), LogoURL.getText().toString());
+                    DAO.getInstance().AddCompany(Name.getText().toString(), LogoURL.getText().toString(), StockTicker.getText().toString());
                 }
                 if(DAO.getEdit()){
                     DAO.getcompanyList().get(DAO.getcompanyList().size()-1).products = DAO.getcompanyList().get(DAO.getCompanyNo()).products;
