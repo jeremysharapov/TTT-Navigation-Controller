@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class CompanyFragment extends Fragment implements ICallBack {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.activity_main, container, false);
 
+        DAO.getHelper(getContext());
         DAO.getInstance();
         DAO.getInstance().setCallBack(this);
         DAO.getStockURL();
@@ -74,7 +76,7 @@ public class CompanyFragment extends Fragment implements ICallBack {
 
                         if(Edit.isChecked()){
                             DAO.setEdit(true);
-                            Toast.makeText(getContext(),"Edit " + DAO.getcompanyList().get(position).company_name,Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(),"Edit " + DAO.getcompanyList().get(position).getName(),Toast.LENGTH_LONG).show();
                             Fragment editCompanyFragment = new EditCompanyFragment();
                             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -84,7 +86,7 @@ public class CompanyFragment extends Fragment implements ICallBack {
                         }
 
                         else {
-                            Toast.makeText(getContext(), DAO.getcompanyList().get(position).company_name, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), DAO.getcompanyList().get(position).getName(), Toast.LENGTH_SHORT).show();
                             Fragment productFragment = new ProductFragment();
                             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -102,7 +104,13 @@ public class CompanyFragment extends Fragment implements ICallBack {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
+                                        int temp = Integer.parseInt("" + DAO.getcompanyList().get(pos).getId());
                                         DAO.getcompanyList().remove(pos);
+                                        try {
+                                            DAO.helper.getmCompanyDao().deleteById(temp);
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                        }
                                         recyclerAdapter=new VerticalAdapter(DAO.getcompanyList());
                                         LinearLayoutManager layoutmanager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
                                         recycler_view.setLayoutManager(layoutmanager2);
@@ -116,7 +124,7 @@ public class CompanyFragment extends Fragment implements ICallBack {
                             }
                         };
                         AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
-                        ab.setMessage("Are you sure you want to delete " + DAO.getcompanyList().get(position).company_name + "?").setPositiveButton("Yes", dialogClickListener)
+                        ab.setMessage("Are you sure you want to delete " + DAO.getcompanyList().get(position).getName() + "?").setPositiveButton("Yes", dialogClickListener)
                                 .setNegativeButton("No", dialogClickListener).show();
                     }
                 })
@@ -190,10 +198,10 @@ public class CompanyFragment extends Fragment implements ICallBack {
         @Override
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
-            holder.txtView.setText(verticalList.get(position).company_name);
-            holder.stock.setText(verticalList.get(position).stock_ticker + " - " + verticalList.get(position).stock_price);
+            holder.txtView.setText(verticalList.get(position).getName());
+            holder.stock.setText(verticalList.get(position).getStock_ticker() + " - " + verticalList.get(position).getStock_price());
             // If you want to access separate part of it
-            Picasso.with(getContext()).load(verticalList.get(position).logoURL).placeholder(R.mipmap.ic_launcher).into(holder.imView);
+            Picasso.with(getContext()).load(verticalList.get(position).getLogoURL()).placeholder(R.mipmap.ic_launcher).into(holder.imView);
 
         }
 

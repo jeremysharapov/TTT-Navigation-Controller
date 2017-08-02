@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,12 @@ public class ProductFragment extends Fragment {
         product_recycler_view= (RecyclerView) view.findViewById(R.id.vertical_recycler_view);
 
         // Get the Company to display correct Products
-        int companyNo = getCompanyNo();
+        final int companyNo = getCompanyNo();
 
 
-
-        recyclerProductAdapter = new VerticalProductAdapter(DAO.getcompanyList().get(companyNo).products);
+        DAO.getInstance().getFromDB();
+        final ArrayList<Product> tempArrayList = new ArrayList<Product>(DAO.getcompanyList().get(companyNo).getProducts());
+        recyclerProductAdapter = new VerticalProductAdapter(tempArrayList);
 
 
         LinearLayoutManager layoutmanager
@@ -69,7 +71,7 @@ public class ProductFragment extends Fragment {
 
                         if(Edit.isChecked()){
                             DAO.setEdit(true);
-                            Toast.makeText(getContext(),"Edit " + DAO.getcompanyList().get(getCompanyNo()).products.get(position).product_name,Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(),"Edit " + tempArrayList.get(position).getName(), Toast.LENGTH_LONG).show();
                             Fragment editProductFragment = new EditProductFragment();
                             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -79,7 +81,7 @@ public class ProductFragment extends Fragment {
                         }
 
                         else {
-                            Toast.makeText(getContext(), DAO.getcompanyList().get(getCompanyNo()).products.get(position).product_name, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), tempArrayList.get(position).getName(), Toast.LENGTH_SHORT).show();
                             Fragment webFragment = new WebFragment();
                             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -99,8 +101,16 @@ public class ProductFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
-                                        DAO.getcompanyList().get(DAO.getCompanyNo()).products.remove(pos);
-                                        recyclerProductAdapter=new ProductFragment.VerticalProductAdapter(DAO.getcompanyList().get(DAO.getCompanyNo()).products);
+                                        int temp = Integer.parseInt("" + tempArrayList.get(pos).getId());
+
+
+                                        tempArrayList.remove(pos);
+                                        try {
+                                            DAO.helper.getmProductDao().deleteById(temp);
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                        }
+                                        recyclerProductAdapter=new ProductFragment.VerticalProductAdapter(tempArrayList);
                                         LinearLayoutManager layoutmanager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
                                         product_recycler_view.setLayoutManager(layoutmanager2);
                                         product_recycler_view.setAdapter(recyclerProductAdapter);
@@ -113,7 +123,7 @@ public class ProductFragment extends Fragment {
                             }
                         };
                         AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
-                        ab.setMessage("Are you sure you want to delete " + DAO.getcompanyList().get(getCompanyNo()).products.get(position).product_name + "?").setPositiveButton("Yes", dialogClickListener)
+                        ab.setMessage("Are you sure you want to delete " + tempArrayList.get(position).getName() + "?").setPositiveButton("Yes", dialogClickListener)
                                 .setNegativeButton("No", dialogClickListener).show();
 
 
@@ -185,8 +195,8 @@ public class ProductFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final MyViewHolder holder, int position) {
-            holder.textProductName.setText(verticalList.get(position).product_name);
-            Picasso.with(getContext()).load(verticalList.get(position).logoURL).placeholder(R.mipmap.ic_launcher).into(holder.imView);
+            holder.textProductName.setText(verticalList.get(position).getName());
+            Picasso.with(getContext()).load(verticalList.get(position).getLogoURL()).placeholder(R.mipmap.ic_launcher).into(holder.imView);
         }
 
         @Override

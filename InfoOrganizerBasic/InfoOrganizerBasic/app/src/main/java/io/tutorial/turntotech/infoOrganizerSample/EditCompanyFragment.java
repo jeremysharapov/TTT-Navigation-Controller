@@ -15,6 +15,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import java.sql.SQLException;
+
 public class EditCompanyFragment extends Fragment{
     EditText Name, LogoURL, StockTicker;
     Button submitButton;
@@ -41,30 +43,60 @@ public class EditCompanyFragment extends Fragment{
         addButton.setVisibility(View.INVISIBLE);
 
         if(DAO.getEdit()){
-            Name.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).company_name);
-            LogoURL.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).logoURL);
-            StockTicker.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).stock_ticker);
+            Name.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).getName());
+            LogoURL.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).getLogoURL());
+            StockTicker.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).getStock_ticker());
         }
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LogoURL.getText().toString().equals("") && StockTicker.getText().toString().equals("")){
-                    DAO.getInstance().AddCompany(Name.getText().toString(), "R.mipmap.ic_launcher", "_");
-                }
-                else if (LogoURL.getText().toString().equals("")){
-                    DAO.getInstance().AddCompany(Name.getText().toString(), "R.mipmap.ic_launcher", StockTicker.getText().toString());
-                }
-                else if (StockTicker.getText().toString().equals("")){
-                    DAO.getInstance().AddCompany(Name.getText().toString(), LogoURL.getText().toString(), "_");
+                if (DAO.getEdit()){
+                    if (LogoURL.getText().toString().equals("") && StockTicker.getText().toString().equals("")){
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setName(Name.getText().toString());
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setLogoURL("R.mipmap.ic_launcher");
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setStock_ticker("_");
+                    }
+                    else if (LogoURL.getText().toString().equals("")){
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setName(Name.getText().toString());
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setLogoURL("R.mipmap.ic_launcher");
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setStock_ticker(StockTicker.getText().toString());
+                    }
+                    else if (StockTicker.getText().toString().equals("")){
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setName(Name.getText().toString());
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setLogoURL(LogoURL.getText().toString());
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setStock_ticker("_");
+                    }
+                    else {
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setName(Name.getText().toString());
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setLogoURL(LogoURL.getText().toString());
+                        DAO.getcompanyList().get(DAO.getCompanyNo()).setStock_ticker(StockTicker.getText().toString());
+                    }
+                    try {
+                        DAO.helper.getmCompanyDao().update(DAO.getcompanyList().get(DAO.getCompanyNo()));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else {
-                    DAO.getInstance().AddCompany(Name.getText().toString(), LogoURL.getText().toString(), StockTicker.getText().toString());
+                    Company comp;
+                    if (LogoURL.getText().toString().equals("") && StockTicker.getText().toString().equals("")) {
+                        comp = new Company(Name.getText().toString(), "R.mipmap.ic_launcher", "_");
+                    } else if (LogoURL.getText().toString().equals("")) {
+                        comp = new Company(Name.getText().toString(), "R.mipmap.ic_launcher", StockTicker.getText().toString());
+                    } else if (StockTicker.getText().toString().equals("")) {
+                        comp = new Company(Name.getText().toString(), LogoURL.getText().toString(), "_");
+                    } else {
+                        comp = new Company(Name.getText().toString(), LogoURL.getText().toString(), StockTicker.getText().toString());
+                    }
+                    DAO.getcompanyList().add(comp);
+                    try {
+                        DAO.helper.getmCompanyDao().create(comp);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
-                if(DAO.getEdit()){
-                    DAO.getcompanyList().get(DAO.getcompanyList().size()-1).products = DAO.getcompanyList().get(DAO.getCompanyNo()).products;
-                    DAO.getcompanyList().remove(DAO.getCompanyNo());
-                }
+
                 Fragment CompanyFragment = new CompanyFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

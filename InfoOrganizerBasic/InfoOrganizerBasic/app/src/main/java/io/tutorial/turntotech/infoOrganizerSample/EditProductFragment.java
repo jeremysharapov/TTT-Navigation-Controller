@@ -15,6 +15,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 
 public class EditProductFragment extends Fragment {
     EditText Name, LogoURL, ProductURL;
@@ -40,30 +43,56 @@ public class EditProductFragment extends Fragment {
         Edit = (CheckBox)activity.findViewById(R.id.Edit);
         Edit.setVisibility(View.INVISIBLE);
         addButton.setVisibility(View.INVISIBLE);
+        final ArrayList<Product> tempArrayList = new ArrayList<Product>(DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts());
 
         if(DAO.getEdit()){
-            Name.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).products.get(DAO.getProductNo()).product_name);
-            LogoURL.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).products.get(DAO.getProductNo()).logoURL);
-            ProductURL.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).products.get(DAO.getProductNo()).productURL);
+            Name.setText(tempArrayList.get(DAO.getProductNo()).getName());
+            LogoURL.setText(tempArrayList.get(DAO.getProductNo()).getLogoURL());
+            ProductURL.setText(tempArrayList.get(DAO.getProductNo()).getProductURL());
         }
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (LogoURL.getText().toString().equals("") && ProductURL.getText().toString().equals("")){
-                    DAO.getInstance().AddProduct(Name.getText().toString(), "R.mipmap.ic_launcher", "https://www.google.com");
-                }
-                else if (LogoURL.getText().toString().equals("")){
-                    DAO.getInstance().AddProduct(Name.getText().toString(), "R.mipmap.ic_launcher", ProductURL.getText().toString());
-                }
-                else if (ProductURL.getText().toString().equals("")){
-                    DAO.getInstance().AddProduct(Name.getText().toString(), LogoURL.getText().toString(), "https://www.google.com");
+                if (DAO.getEdit()){
+                    if (LogoURL.getText().toString().equals("") && ProductURL.getText().toString().equals("")) {
+                        tempArrayList.get(DAO.getProductNo()).setName(Name.getText().toString());
+                        tempArrayList.get(DAO.getProductNo()).setLogoURL("R.mipmap.ic_launcher");
+                        tempArrayList.get(DAO.getProductNo()).setProductURL("https://www.google.com");
+                    } else if (LogoURL.getText().toString().equals("")) {
+                        tempArrayList.get(DAO.getProductNo()).setName(Name.getText().toString());
+                        tempArrayList.get(DAO.getProductNo()).setLogoURL("R.mipmap.ic_launcher");
+                        tempArrayList.get(DAO.getProductNo()).setProductURL(ProductURL.getText().toString());
+                    } else if (ProductURL.getText().toString().equals("")) {
+                        tempArrayList.get(DAO.getProductNo()).setName(Name.getText().toString());
+                        tempArrayList.get(DAO.getProductNo()).setLogoURL(LogoURL.getText().toString());
+                        tempArrayList.get(DAO.getProductNo()).setProductURL("https://www.google.com");
+                    } else {
+                        tempArrayList.get(DAO.getProductNo()).setName(Name.getText().toString());
+                        tempArrayList.get(DAO.getProductNo()).setLogoURL(LogoURL.getText().toString());
+                        tempArrayList.get(DAO.getProductNo()).setProductURL(ProductURL.getText().toString());
+                    }
+                    try {
+                        DAO.helper.getmProductDao().update(tempArrayList.get(DAO.getProductNo()));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else {
-                    DAO.getInstance().AddProduct(Name.getText().toString(), LogoURL.getText().toString(), ProductURL.getText().toString());
-                }
-                if(DAO.getEdit()){
-                    DAO.getcompanyList().get(DAO.getCompanyNo()).products.remove(DAO.getProductNo());
+                    if (LogoURL.getText().toString().equals("") && ProductURL.getText().toString().equals("")) {
+                        DAO.getInstance().AddProduct(Name.getText().toString(), "R.mipmap.ic_launcher", "https://www.google.com");
+                    } else if (LogoURL.getText().toString().equals("")) {
+                        DAO.getInstance().AddProduct(Name.getText().toString(), "R.mipmap.ic_launcher", ProductURL.getText().toString());
+                    } else if (ProductURL.getText().toString().equals("")) {
+                        DAO.getInstance().AddProduct(Name.getText().toString(), LogoURL.getText().toString(), "https://www.google.com");
+                    } else {
+                        DAO.getInstance().AddProduct(Name.getText().toString(), LogoURL.getText().toString(), ProductURL.getText().toString());
+                    }
+                    try {
+                        DAO.helper.getmCompanyDao().create(DAO.getcompanyList().get(DAO.getcompanyList().size() - 1));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 Fragment productFragment = new ProductFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();

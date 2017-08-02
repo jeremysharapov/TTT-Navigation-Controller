@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -25,11 +26,25 @@ public class DAO {
     private ICallBack callBack;
 
     static DAO instance;
+    static DatabaseHelper helper;
     public static DAO getInstance(){
         if (instance == null){
             instance = new DAO();
+            instance.getFromDB();
+            if(companyList.size() == 0){
+                instance.createDummy();
+                instance.getFromDB();
+            }
+
         }
         return instance;
+    }
+
+    public static DatabaseHelper getHelper(Context context){
+        if (helper == null){
+            helper = new DatabaseHelper(context);
+        }
+        return helper;
     }
 
     public void setCallBack(ICallBack callBack){
@@ -62,7 +77,7 @@ public class DAO {
             if (i != 0){
                 stockURL = stockURL + "+";
             }
-            stockURL = stockURL + DAO.getcompanyList().get(i).stock_ticker;
+            stockURL = stockURL + DAO.getcompanyList().get(i).getStock_ticker();
         }
         stockURL = stockURL + "&f=nl1";
         return stockURL;
@@ -104,84 +119,131 @@ public class DAO {
             }
         }
         for (int n = 0; n < DAO.getcompanyList().size(); n++){
-            DAO.getcompanyList().get(n).stock_price = last.get(n);
+            DAO.getcompanyList().get(n).setStock_price(last.get(n));
         }
     }
 
     private DAO(){
         companyList = new ArrayList<Company>();
-        Company Apple = new Company("Apple", "http://pngimg.com/uploads/apple_logo/apple_logo_PNG19675.png", "AAPL");
-        Apple.products.add(new Product("iPhone",
+
+    }
+
+    public void createDummy(){
+        Company Apple = new Company("Apple", "https://seeklogo.com/images/A/Apple-logo-4DC2B05F7D-seeklogo.com.png", "AAPL");
+        Product iPhone = new Product("iPhone",
                 "https://staticshop.o2.co.uk/product/images/apple_iphone_7_plus_128gb_red_sku_header.png?cb=2077cd5d85e2dd9b6905a70ad30e33ba",
-                "https://www.apple.com/iphone/"));
-        Apple.products.add(new Product("iPad",
+                "https://www.apple.com/iphone/",
+                Apple);
+        Product iPad = new Product("iPad",
                 "https://pisces.bbystatic.com/BestBuy_US/store/rtb/experience/apple/images/iPad-img.png",
-                "https://www.apple.com/ipad/"));
-        Apple.products.add(new Product("Macintosh",
+                "https://www.apple.com/ipad/",
+                Apple);
+        Product Mac = new Product("Macintosh",
                 "https://www.imobie.com/support/img/retina-macbook-12-inch.png",
-                "https://www.apple.com/mac/"));
+                "https://www.apple.com/mac/",
+                Apple);
 
         Company Samsung = new Company("Samsung", "http://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c533.png", "005930.KS");
-        Samsung.products.add(new Product("Galaxy S",
+        Product GalaxyS = new Product("Galaxy S",
                 "http://store.virginmedia.com/content/dam/eSales/mobile/responsive/Samsung/Zoom/galaxy_s8_grey_comp.png",
-                "http://www.samsung.com/us/explore/galaxy-s8/"));
-        Samsung.products.add(new Product("Galaxy Note",
+                "http://www.samsung.com/us/explore/galaxy-s8/",
+                Samsung);
+        Product GalaxyNote = new Product("Galaxy Note",
                 "http://www.adweek.com/wp-content/uploads/files/2016_Sep/note7_samsung-fire-hed-2016.png",
-                "https://www.phonearena.com/phones/Samsung-Galaxy-Note-Fan-Edition_id10591"));
-        Samsung.products.add(new Product("Galaxy Book",
+                "https://www.phonearena.com/phones/Samsung-Galaxy-Note-Fan-Edition_id10591",
+                Samsung);
+        Product GalaxyBook = new Product("Galaxy Book",
                 "http://images.samsung.com/is/image/samsung/p5/uk/pcd/mobile/PCD_Mobile_Tablet_03_Featurebenefit_PC_img_20160831.png?$ORIGIN_PNG$",
-                "http://www.samsung.com/us/explore/galaxy-book/"));
+                "http://www.samsung.com/us/explore/galaxy-book/",
+                Samsung);
 
         Company Motorola = new Company("Motorola", "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Motorola_Mobility_Logo_2015.svg/1280px-Motorola_Mobility_Logo_2015.svg.png", "0992.HK");
-        Motorola.products.add(new Product("Moto Z",
+        Product MotoZ = new Product("Moto Z",
                 "http://www.zailet.com/posts/post60/3.jpg",
-                "https://www.motorola.com/us/products/moto-z-force-edition-gen-2"));
-        Motorola.products.add(new Product("Moto G",
+                "https://www.motorola.com/us/products/moto-z-force-edition-gen-2",
+                Motorola);
+        Product MotoG = new Product("Moto G",
                 "http://www3.lenovo.com/medias/lenovo-moto-g5-plus-hero.png?context=bWFzdGVyfGltYWdlc3w5MTE5M3xpbWFnZS9wbmd8aW1hZ2VzL2gxMy9oZDgvOTQwMTc4NjY2Mjk0Mi5wbmd8Y2VhMDgxNDg3ZjQwZDJkNGM3OWFmMzJjNzcxNjljY2JhNDA4ZjI5YzMyMDY1NTgzNjc4MWVhOTVmOTM1Y2M5ZA",
-                "https://www.motorola.com/us/products/moto-g-plus"));
-        Motorola.products.add(new Product("Moto E",
+                "https://www.motorola.com/us/products/moto-g-plus",
+                Motorola);
+        Product MotoE = new Product("Moto E",
                 "https://www.motorola.com/sites/default/files/library/storage/products/smartphones/moto-e4-plus-NA-1000.png",
-                "https://www.motorola.com/us/products/moto-e-plus-gen-4"));
+                "https://www.motorola.com/us/products/moto-e-plus-gen-4",
+                Motorola);
 
         Company Microsoft = new Company("Microsoft", "http://pngimg.com/uploads/microsoft/microsoft_PNG16.png", "MSFT");
-        Microsoft.products.add(new Product("Xbox One",
+        Product Xbox = new Product("Xbox One",
                 "http://images.bbycastatic.ca/sf/projects/projectscorpio/assets/xbox-one-x-console.png",
-                "http://www.xbox.com/en-us/xbox-one-x"));
-        Microsoft.products.add(new Product("Surface Pro",
+                "http://www.xbox.com/en-us/xbox-one-x",
+                Microsoft);
+        Product SurfacePro = new Product("Surface Pro",
                 "https://surfacetip.com/wp-content/uploads/2017/01/surface-pro-4-png-1-300x169.png",
-                "https://www.microsoft.com/en-us/surface/devices/surface-pro/overview"));
-        Microsoft.products.add(new Product("Surface Laptop",
+                "https://www.microsoft.com/en-us/surface/devices/surface-pro/overview",
+                Microsoft);
+        Product SurfaceBook = new Product("Surface Laptop",
                 "https://d243u7pon29hni.cloudfront.net/images/products/portatil-microsoft-surface-london-platino-1364584-10_ad_l.png",
-                "https://www.microsoft.com/en-us/surface/devices/surface-laptop/overview"));
+                "https://www.microsoft.com/en-us/surface/devices/surface-laptop/overview",
+                Microsoft);
 
         Company LG = new Company("LG", "https://seeklogo.com/images/L/LG-logo-1409344847-seeklogo.com.png", "LGLD.IL");
-        LG.products.add(new Product("LG G",
+        Product LGG = new Product("LG G",
                 "https://www.androidcentral.com/sites/androidcentral.com/files/styles/large/public/topic_images/2017/lg-g6-02.png?itok=6GoJ4X3S",
-                "http://www.lg.com/us/mobile-phones/g6"));
-        LG.products.add(new Product("LG Gram",
+                "http://www.lg.com/us/mobile-phones/g6",
+                LG);
+        Product Gram = new Product("LG Gram",
                 "http://www.lg.com/us/images/stepupChart/15z.png",
-                "http://www.lg.com/us/laptops"));
-        LG.products.add(new Product("LG OLED TV",
+                "http://www.lg.com/us/laptops",
+                LG);
+        Product TV = new Product("LG OLED TV",
                 "https://www.fouanistore.com/images/thumbnails/465/465/detailed/3/_55%E2%80%9D_LG_OLED_TV_55EG910_(2).gif",
-                "http://www.lg.com/us/oled-tvs"));
+                "http://www.lg.com/us/oled-tvs",
+                LG);
 
         Company HTC = new Company("HTC", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Htc_new_logo.svg/500px-Htc_new_logo.svg.png", "2498.TW");
-        HTC.products.add(new Product("HTC U11",
+        Product U11 = new Product("HTC U11",
                 "https://www.htc.com/managed-assets/shared/desktop/smartphones/htc-u11/explorer/en_US/htc-u11-black-global-phone-listing.png",
-                "http://www.htc.com/us/smartphones/htc-u11/"));
-        HTC.products.add(new Product("HTC U Ultra",
+                "http://www.htc.com/us/smartphones/htc-u11/",
+                HTC);
+        Product UUltra = new Product("HTC U Ultra",
                 "http://www.htc.com/managed-assets/shared/desktop/smartphones/htc-u-ultra/explorer/htc-u-ultra-blue-global-phone-listing.png",
-                "http://www.htc.com/us/smartphones/htc-u-ultra/"));
-        HTC.products.add(new Product("HTC Vive",
+                "http://www.htc.com/us/smartphones/htc-u-ultra/",
+                HTC);
+        Product Vive = new Product("HTC Vive",
                 "https://www.vive.com/media/filer_public/b8/96/b896b746-0118-4105-93b6-4270db79e1a1/product-vive-family-shot.png",
-                "https://www.vive.com/us/"));
+                "https://www.vive.com/us/",
+                HTC);
 
-        companyList.add(Apple);
-        companyList.add(Samsung);
-        companyList.add(Motorola);
-        companyList.add(Microsoft);
-        companyList.add(LG);
-        companyList.add(HTC);
+        try{
+            helper.getmCompanyDao().create(Apple);
+            helper.getmCompanyDao().create(Samsung);
+            helper.getmCompanyDao().create(Microsoft);
+            helper.getmCompanyDao().create(Motorola);
+            helper.getmCompanyDao().create(LG);
+            helper.getmCompanyDao().create(HTC);
+
+            helper.getmProductDao().create(iPhone);
+            helper.getmProductDao().create(iPad);
+            helper.getmProductDao().create(Mac);
+            helper.getmProductDao().create(GalaxyS);
+            helper.getmProductDao().create(GalaxyNote);
+            helper.getmProductDao().create(GalaxyBook);
+            helper.getmProductDao().create(Xbox);
+            helper.getmProductDao().create(SurfaceBook);
+            helper.getmProductDao().create(SurfacePro);
+            helper.getmProductDao().create(MotoZ);
+            helper.getmProductDao().create(MotoG);
+            helper.getmProductDao().create(MotoE);
+            helper.getmProductDao().create(LGG);
+            helper.getmProductDao().create(Gram);
+            helper.getmProductDao().create(TV);
+            helper.getmProductDao().create(U11);
+            helper.getmProductDao().create(UUltra);
+            helper.getmProductDao().create(Vive);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
     }
 
     public void AddCompany(String Name, String LogoURL, String StockTicker){
@@ -190,8 +252,8 @@ public class DAO {
     }
 
     public void AddProduct(String Name, String LogoURL, String ProductURL){
-        Product product = new Product(Name, LogoURL, ProductURL);
-        DAO.getcompanyList().get(DAO.getCompanyNo()).products.add(product);
+        Product product = new Product(Name, LogoURL, ProductURL, DAO.getcompanyList().get(DAO.getCompanyNo()));
+        DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts().add(product);
     }
 
     public static void setEdit(boolean bool) {
@@ -201,4 +263,14 @@ public class DAO {
     public static boolean getEdit() {
         return edit;
     }
+
+    public void getFromDB(){
+        try {
+            companyList.clear();
+            companyList = (ArrayList<Company>) helper.getmCompanyDao().queryForAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

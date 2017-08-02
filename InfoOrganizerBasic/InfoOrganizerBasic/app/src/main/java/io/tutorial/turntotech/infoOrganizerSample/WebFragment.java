@@ -12,6 +12,8 @@ import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
+import java.util.ArrayList;
+
 
 public class WebFragment extends Fragment{
     WebView webView;
@@ -27,7 +29,8 @@ public class WebFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.activity_web, container, false);
         webView = (WebView) view.findViewById(R.id.WebView);
-        webView.loadUrl(DAO.getcompanyList().get(DAO.getCompanyNo()).products.get(DAO.getProductNo()).productURL);
+        final ArrayList<Product> tempArrayList = new ArrayList<Product>(DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts());
+        webView.loadUrl(tempArrayList.get(DAO.getProductNo()).getProductURL());
 
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
