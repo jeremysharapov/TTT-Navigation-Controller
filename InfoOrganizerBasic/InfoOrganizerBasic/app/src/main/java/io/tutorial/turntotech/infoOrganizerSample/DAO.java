@@ -253,7 +253,11 @@ public class DAO {
 
     public void AddProduct(String Name, String LogoURL, String ProductURL){
         Product product = new Product(Name, LogoURL, ProductURL, DAO.getcompanyList().get(DAO.getCompanyNo()));
-        DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts().add(product);
+        try {
+            helper.getmProductDao().create(product);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void setEdit(boolean bool) {

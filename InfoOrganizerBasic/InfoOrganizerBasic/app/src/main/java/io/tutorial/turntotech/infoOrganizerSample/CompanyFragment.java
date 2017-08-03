@@ -105,9 +105,9 @@ public class CompanyFragment extends Fragment implements ICallBack {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
                                         int temp = Integer.parseInt("" + DAO.getcompanyList().get(pos).getId());
-                                        DAO.getcompanyList().remove(pos);
                                         try {
-                                            DAO.helper.getmCompanyDao().deleteById(temp);
+                                            DAO.helper.getmCompanyDao().delete(DAO.getcompanyList().get(pos));
+                                            DAO.getcompanyList().remove(pos);
                                         } catch (SQLException e) {
                                             e.printStackTrace();
                                         }

@@ -102,11 +102,10 @@ public class ProductFragment extends Fragment {
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
                                         int temp = Integer.parseInt("" + tempArrayList.get(pos).getId());
-
-
-                                        tempArrayList.remove(pos);
                                         try {
-                                            DAO.helper.getmProductDao().deleteById(temp);
+                                            DAO.helper.getmProductDao().delete(tempArrayList.get(pos));
+                                            tempArrayList.remove(pos);
+                                            DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts().remove(pos);
                                         } catch (SQLException e) {
                                             e.printStackTrace();
                                         }

@@ -88,11 +88,6 @@ public class EditProductFragment extends Fragment {
                     } else {
                         DAO.getInstance().AddProduct(Name.getText().toString(), LogoURL.getText().toString(), ProductURL.getText().toString());
                     }
-                    try {
-                        DAO.helper.getmCompanyDao().create(DAO.getcompanyList().get(DAO.getcompanyList().size() - 1));
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
                 }
                 Fragment productFragment = new ProductFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
