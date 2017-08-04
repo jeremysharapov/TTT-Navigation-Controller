@@ -125,7 +125,6 @@ public class DAO {
 
     private DAO(){
         companyList = new ArrayList<Company>();
-
     }
 
     public void createDummy(){

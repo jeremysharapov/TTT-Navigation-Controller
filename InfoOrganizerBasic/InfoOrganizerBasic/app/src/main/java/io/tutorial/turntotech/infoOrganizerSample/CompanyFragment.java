@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -137,7 +136,7 @@ public class CompanyFragment extends Fragment implements ICallBack {
         actionBar.setCustomView(R.layout.toolbar);
         backButton = (ImageButton)activity.findViewById(R.id.imageButton);
         addButton = (ImageButton)activity.findViewById(R.id.imageButton2);
-        Edit = (CheckBox)activity.findViewById(R.id.Edit);
+        Edit = (CheckBox)activity.findViewById(R.id.EditInfo);
         backButton.setVisibility(View.INVISIBLE);
 
 
@@ -155,7 +154,6 @@ public class CompanyFragment extends Fragment implements ICallBack {
                 fragmentTransaction.commit();
             }
         });
-
 
 
 

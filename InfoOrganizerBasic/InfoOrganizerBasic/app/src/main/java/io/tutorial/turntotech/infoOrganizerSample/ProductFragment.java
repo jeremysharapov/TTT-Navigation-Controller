@@ -2,8 +2,6 @@ package io.tutorial.turntotech.infoOrganizerSample;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -105,7 +103,8 @@ public class ProductFragment extends Fragment {
                                         try {
                                             DAO.helper.getmProductDao().delete(tempArrayList.get(pos));
                                             tempArrayList.remove(pos);
-                                            DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts().remove(pos);
+                                            DAO.getInstance().getFromDB();
+                                            //DAO.getcompanyList().get(DAO.getCompanyNo()).getProducts().remove(pos);
                                         } catch (SQLException e) {
                                             e.printStackTrace();
                                         }
@@ -136,12 +135,18 @@ public class ProductFragment extends Fragment {
         actionBar.setCustomView(R.layout.toolbar);
         backButton = (ImageButton)activity.findViewById(R.id.imageButton);
         addButton = (ImageButton)activity.findViewById(R.id.imageButton2);
-        Edit = (CheckBox)activity.findViewById(R.id.Edit);
+        Edit = (CheckBox)activity.findViewById(R.id.EditInfo);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(),"Back",Toast.LENGTH_LONG).show();
+                Fragment companyFragment = new CompanyFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.mainLayout, companyFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
 

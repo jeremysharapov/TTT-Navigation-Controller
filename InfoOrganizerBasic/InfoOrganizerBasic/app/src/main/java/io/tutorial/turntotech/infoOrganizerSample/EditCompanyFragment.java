@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.sql.SQLException;
 
@@ -28,7 +29,7 @@ public class EditCompanyFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_edit_company, container, false);
         Name = (EditText)view.findViewById(R.id.CompanyName);
-        LogoURL = (EditText)view.findViewById(R.id.LogoURL);
+        LogoURL = (EditText)view.findViewById(R.id.CompLogoURL);
         StockTicker = (EditText)view.findViewById(R.id.StockTicker);
         submitButton = (Button)view.findViewById(R.id.Finish);
 
@@ -38,7 +39,7 @@ public class EditCompanyFragment extends Fragment{
         actionBar.setCustomView(R.layout.toolbar);
         backButton = (ImageButton)activity.findViewById(R.id.imageButton);
         addButton = (ImageButton)activity.findViewById(R.id.imageButton2);
-        Edit = (CheckBox)activity.findViewById(R.id.Edit);
+        Edit = (CheckBox)activity.findViewById(R.id.EditInfo);
         Edit.setVisibility(View.INVISIBLE);
         addButton.setVisibility(View.INVISIBLE);
 
@@ -47,6 +48,19 @@ public class EditCompanyFragment extends Fragment{
             LogoURL.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).getLogoURL());
             StockTicker.setText(DAO.getcompanyList().get(DAO.getCompanyNo()).getStock_ticker());
         }
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(),"Back",Toast.LENGTH_LONG).show();
+                Fragment companyFragment = new CompanyFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.mainLayout, companyFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
